@@ -3,8 +3,12 @@ import BoxHeader from 'component/boxHeader';
 import HelpCard from 'component/helpCard';
 import AddIcon from '@mui/icons-material/Add';
 import CareerCard from 'container/careerCard';
+import { useFieldArray, useFormContext } from 'react-hook-form';
+import { defaultCareerData } from 'util/defaultData';
 
 const CareerBox = () => {
+  const { control } = useFormContext();
+  const { fields, append, remove } = useFieldArray({ control, name: 'careers' });
   return (
     <Grid item>
       <BoxHeader title="경력" />
@@ -15,11 +19,13 @@ const CareerBox = () => {
         ]}
       />
       <Stack display="block" paddingTop={1} spacing={5}>
-        <Button variant="outlined" startIcon={<AddIcon />} sx={{ float: 'right' }}>
+        <Button variant="outlined" startIcon={<AddIcon />} onClick={() => append(defaultCareerData)} sx={{ float: 'right' }}>
           추가하기
         </Button>
         <Stack spacing={1}>
-          <CareerCard />
+          {fields.map((v, i) => (
+            <CareerCard key={`careers_${i}`} index={i} careerRemove={() => remove(i)} />
+          ))}
         </Stack>
       </Stack>
     </Grid>

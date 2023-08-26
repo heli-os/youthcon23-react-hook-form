@@ -4,23 +4,44 @@ import DateInputField from 'component/dateInputField';
 import ProjectCard from 'container/projectCard';
 import ClearIcon from '@mui/icons-material/Clear';
 import { defaultProjectData } from 'util/defaultData';
+import { Controller, useFormContext, useWatch } from 'react-hook-form';
 
 interface Props {
   index: number;
   careerRemove: () => void;
 }
 
-const CareerCard = () => {
+const CareerCard = ({ index, careerRemove }: Props) => {
+  const { control } = useFormContext();
+  const isCurrentField = useWatch({ control, name: `careers.${index}.isCurrent` });
   return (
     <Grid item container direction="row" padding={3} css={careerCardLayout}>
       <Grid item container xs={3} direction="column">
         <Grid item>
           {/*재직 중 일 경우 종료일은 시작일 보다 빠를수 없다 ! 유효성 필요 */}
-          <DateInputField startYear="" startMonth="" endYear="" endMonth="" onChange={(fieldName, fieldValue) => null} required />
+          <Controller
+            control={control}
+            name={`careers.${index}.date`}
+            render={({ field: { value, onChange } }) => (
+              <DateInputField
+                startYear={value.startYear}
+                startMonth={value.startMonth}
+                endYear={value.endYear}
+                endMonth={value.endMonth}
+                onChange={(fieldName, fieldValue) => onChange({ ...value, [fieldName]: fieldValue })}
+                disableEndDate={isCurrentField}
+                required
+              />
+            )}
+          />
         </Grid>
         <Grid item>
           <Stack direction="row" className="date">
-            <Checkbox className="checker" />
+            <Controller
+              control={control}
+              name={`careers.${index}.isCurrent`}
+              render={({ field: { value, onChange } }) => <Checkbox className="checker" value={value} onChange={onChange} />}
+            />
             <Typography className="label">현재 재직중</Typography>
           </Stack>
         </Grid>
@@ -34,7 +55,7 @@ const CareerCard = () => {
                   <TextField variant="standard" placeholder="회사명" inputProps={{ style: { fontSize: 20 } }} />
                 </Grid>
                 <Grid item xs={1}>
-                  <ClearIcon />
+                  <ClearIcon onClick={() => careerRemove()} />
                 </Grid>
               </Grid>
               <Grid item>
