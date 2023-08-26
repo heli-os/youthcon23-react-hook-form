@@ -7,9 +7,18 @@ import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import TitleBox from 'container/titleBox';
 import SkillBox from 'container/skillBox';
 import FloatingBox from 'container/floatingBox';
+import { FormProvider, useForm, useWatch } from 'react-hook-form';
+import { useEffect } from 'react';
+import { defaultResumeData } from 'util/defaultData';
 
 const Create = () => {
+  const resumeForm = useForm({ defaultValues: defaultResumeData, mode: 'onChange' });
+  const titleField = useWatch({ control: resumeForm.control, name: 'title' });
   const MAX_COUNT = 400;
+
+  useEffect(() => {
+    console.log(titleField);
+  }, [titleField]);
 
   return (
     <Container>
@@ -20,13 +29,15 @@ const Create = () => {
             <Typography>🔪퇴를 위한 React Hook Form</Typography>
           </Stack>
         </Grid>
-        <form>
-          <TitleBox />
-          <ProfileBox />
-          <IntroductionBox />
-          <CareerBox />
-          <SkillBox />
-        </form>
+        <FormProvider {...resumeForm}>
+          <form>
+            <TitleBox />
+            <ProfileBox />
+            <IntroductionBox />
+            <CareerBox />
+            <SkillBox />
+          </form>
+        </FormProvider>
       </Grid>
       <FloatingBox submitTrigger={() => null} count={(Math.min(0, MAX_COUNT) / MAX_COUNT) * 100} />
     </Container>
